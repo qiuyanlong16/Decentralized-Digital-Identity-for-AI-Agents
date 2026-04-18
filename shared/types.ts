@@ -1,6 +1,6 @@
 export interface Skill {
   name: string;
-  desc: string;
+  description: string;
   version: string;
   source: "clawhub" | "self-evolved" | "custom";
 }

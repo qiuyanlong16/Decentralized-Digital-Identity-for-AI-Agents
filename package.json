@@ -3,22 +3,20 @@
   "version": "0.1.0",
   "private": true,
   "scripts": {
-    "dev:server": "bun run --watch server/index.ts",
-    "test": "bun test",
-    "cli": "bun run cli/index.mjs"
+    "dev:server": "tsx watch server/index.ts",
+    "test": "vitest run",
+    "cli": "node cli/index.mjs"
   },
   "dependencies": {
-    "hono": "^4.6.0",
     "@hono/node-server": "^1.13.0",
+    "hono": "^4.6.0",
     "sql.js": "^1.11.0",
     "tweetnacl": "^1.0.3",
     "tweetnacl-util": "^0.15.0"
   },
   "devDependencies": {
+    "tsx": "^4.21.0",
     "typescript": "^5.6.0",
-    "bun-types": "^1.1.0"
-  },
-  "workspaces": [
-    "server"
-  ]
+    "vitest": "^4.1.4"
+  }
 }
