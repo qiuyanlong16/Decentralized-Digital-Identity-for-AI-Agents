@@ -1,3 +1,15 @@
+/** Row shape of the profiles table. profile_json contains serialized AgentProfile. */
+export interface ProfileRow {
+  did: string;
+  qr_token: string;
+  profile_json: string;
+  signature: string;
+  public_key: string;
+  visibility: "public" | "private";
+  created_at: string;
+  updated_at: string;
+}
+
 export const TABLES = {
   profiles: `
     CREATE TABLE IF NOT EXISTS profiles (
@@ -6,7 +18,7 @@ export const TABLES = {
       profile_json TEXT NOT NULL,
       signature TEXT NOT NULL,
       public_key TEXT NOT NULL,
-      visibility TEXT DEFAULT 'public',
+      visibility TEXT DEFAULT 'public' CHECK(visibility IN ('public', 'private')),
       created_at TEXT DEFAULT (datetime('now')),
       updated_at TEXT DEFAULT (datetime('now'))
     )

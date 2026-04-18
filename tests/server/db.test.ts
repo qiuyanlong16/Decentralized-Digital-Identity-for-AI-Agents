@@ -1,9 +1,8 @@
 import { describe, it, expect } from "vitest";
 import initSqlJs from "sql.js";
-import type { Database } from "sql.js";
 import { TABLES } from "../../server/db/schema.js";
 
-async function createTestDb(): Promise<Database> {
+async function createTestDb() {
   const SQL = await initSqlJs();
   const db = new SQL.Database();
   for (const sql of Object.values(TABLES)) {
@@ -20,6 +19,31 @@ describe("Database schema", () => {
     expect(columns).toContain("did");
     expect(columns).toContain("qr_token");
     expect(columns).toContain("profile_json");
+    expect(columns).toContain("visibility");
+  });
+
+  it("rejects duplicate did", async () => {
+    const db = await createTestDb();
+    db.run(
+      "INSERT INTO profiles (did, qr_token, profile_json, signature, public_key) VALUES (?, ?, ?, ?, ?)",
+      ["did:test", "agtid_1", "{}", "sig", "pk"]
+    );
+    expect(() => db.run(
+      "INSERT INTO profiles (did, qr_token, profile_json, signature, public_key) VALUES (?, ?, ?, ?, ?)",
+      ["did:test", "agtid_2", "{}", "sig", "pk"]
+    )).toThrow();
+  });
+
+  it("rejects duplicate qr_token", async () => {
+    const db = await createTestDb();
+    db.run(
+      "INSERT INTO profiles (did, qr_token, profile_json, signature, public_key) VALUES (?, ?, ?, ?, ?)",
+      ["did:test1", "agtid_same", "{}", "sig", "pk"]
+    );
+    expect(() => db.run(
+      "INSERT INTO profiles (did, qr_token, profile_json, signature, public_key) VALUES (?, ?, ?, ?, ?)",
+      ["did:test2", "agtid_same", "{}", "sig", "pk"]
+    )).toThrow();
   });
 
   it("inserts and reads a profile", async () => {
