@@ -1,0 +1,21 @@
+{
+  "name": "agent-id-card",
+  "version": "0.1.0",
+  "private": true,
+  "scripts": {
+    "dev:server": "bun run --watch server/index.ts",
+    "test": "bun test",
+    "cli": "bun run cli/index.mjs"
+  },
+  "dependencies": {
+    "hono": "^4.6.0",
+    "@hono/node-server": "^1.13.0",
+    "sql.js": "^1.11.0",
+    "tweetnacl": "^1.0.3",
+    "tweetnacl-util": "^0.15.0"
+  },
+  "devDependencies": {
+    "typescript": "^5.6.0",
+    "bun-types": "^1.1.0"
+  }
+}
