@@ -1,6 +1,7 @@
 /**
- * 从 DID 生成短码，格式: agtid_<8位字符>
- * 确定性：同一个 DID 永远生成同一个 token
+ * Generate a short code from a DID. Format: agtid_<8 chars>.
+ * Deterministic: same DID always produces the same token.
+ * Note: Uses djb2 hash (31-bit), suitable for display tokens up to ~50k DIDs.
  */
 export function generateQrToken(did: string): string {
   let hash = 0;

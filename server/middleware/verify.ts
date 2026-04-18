@@ -2,7 +2,9 @@ import nacl from "tweetnacl";
 import { decodeBase64 } from "tweetnacl-util";
 
 /**
- * 验证 Profile JSON 的 Ed25519 签名
+ * Verify Ed25519 signature over Profile JSON.
+ * Strips 'sig:' and 'ed25519:' prefixes if present.
+ * Returns false for any invalid input.
  */
 export function verifySignature(
   profileJson: string,
