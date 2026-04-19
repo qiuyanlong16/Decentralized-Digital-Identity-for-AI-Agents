@@ -1,13 +1,13 @@
 {
-  "name": "agent-id-card-monorepo",
+  "name": "agentic",
   "version": "0.1.0",
   "private": true,
   "scripts": {
-    "dev:server": "cd packages/server && npm run dev",
-    "start:server": "cd packages/server && npm start",
-    "test": "cd packages/cli && npm test && cd ../server && npm test",
+    "dev:api": "cd packages/api && npm run dev",
+    "start:api": "cd packages/api && npm start",
+    "test": "cd packages/cli && npm test && cd ../api && npm test",
     "test:cli": "cd packages/cli && npm test",
-    "test:server": "cd packages/server && npm test",
+    "test:api": "cd packages/api && npm test",
     "cli": "cd packages/cli && node index.mjs"
   }
 }

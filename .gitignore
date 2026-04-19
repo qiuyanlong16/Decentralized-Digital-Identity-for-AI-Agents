@@ -7,5 +7,7 @@ dist/
 *.sqlite
 .DS_Store
 *.lock
-packages/server/.agent-id-card/
+packages/api/.agent-id-card/
+packages/cli/.agent-id-card/
 .agent-id-card/
+.idea/

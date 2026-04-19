@@ -1,11 +1,20 @@
 {
-  "name": "agent-id-card",
-  "version": "0.1.0",
+  "name": "agentic-cli",
+  "version": "0.1.1",
   "description": "CLI tool for Agent Identity Card — generate DIDs, sign profiles, and register agents",
   "type": "module",
   "bin": {
     "agent-id-card": "./index.mjs"
   },
+  "files": [
+    "*.mjs"
+  ],
+  "homepage": "https://github.com/qiuyanlong16/Decentralized-Digital-Identity-for-AI-Agents#readme",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/qiuyanlong16/Decentralized-Digital-Identity-for-AI-Agents.git"
+  },
+  "keywords": ["agent", "identity", "DID", "did-key", "ed25519", "cli"],
   "scripts": {
     "test": "vitest run"
   },

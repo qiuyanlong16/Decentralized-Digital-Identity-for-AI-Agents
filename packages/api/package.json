@@ -1,7 +1,7 @@
 {
-  "name": "agent-id-card-server",
+  "name": "agentic-api",
   "version": "0.1.0",
-  "description": "Hono API server with SQLite for Agent Identity Card — serves API and web frontend",
+  "description": "REST API server for Agent Identity Card — profile registration, discovery, and social features",
   "type": "module",
   "main": "index.ts",
   "scripts": {

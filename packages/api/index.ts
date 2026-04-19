@@ -17,7 +17,9 @@ getDb();
 
 export const BASE_URL = process.env.BASE_URL || "http://localhost:3000";
 
-const WEB_DIR = join(__dirname, "web");
+const WEB_DIR = process.env.WEB_DIR
+  ? process.env.WEB_DIR
+  : join(__dirname, "../h5");
 
 app.use("/*", cors());
 app.route("/api", profileRoutes);
