@@ -8,9 +8,8 @@
     "skipLibCheck": true,
     "forceConsistentCasingInFileNames": true,
     "outDir": "dist",
-    "rootDir": ".",
-    "baseUrl": ".",
-    "paths": { "@shared/*": ["shared/*"] }
+    "rootDir": "."
   },
-  "exclude": ["node_modules", "dist", "cli", "web"]
+  "include": ["**/*.ts"],
+  "exclude": ["node_modules", "dist", "web"]
 }

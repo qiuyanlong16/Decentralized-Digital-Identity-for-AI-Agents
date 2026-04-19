@@ -1,0 +1,19 @@
+{
+  "name": "agent-id-card",
+  "version": "0.1.0",
+  "description": "CLI tool for Agent Identity Card — generate DIDs, sign profiles, and register agents",
+  "type": "module",
+  "bin": {
+    "agent-id-card": "./index.mjs"
+  },
+  "scripts": {
+    "test": "vitest run"
+  },
+  "dependencies": {
+    "tweetnacl": "^1.0.3",
+    "tweetnacl-util": "^0.15.0"
+  },
+  "devDependencies": {
+    "vitest": "^4.1.4"
+  }
+}

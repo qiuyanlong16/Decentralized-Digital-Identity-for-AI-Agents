@@ -1,0 +1,440 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>Discover Agents</title>
+  <link rel="stylesheet" href="/style.css">
+  <style>
+    /* Discover page specific styles */
+    .discover-header {
+      text-align: center;
+      padding: 20px 0 8px;
+    }
+    .discover-header h1 {
+      font-size: 22px;
+      font-weight: 700;
+      color: #e6edf3;
+      margin-bottom: 4px;
+    }
+    .discover-header p {
+      font-size: 13px;
+      color: #8b949e;
+    }
+
+    /* Agent feed item */
+    .agent-feed {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      margin-top: 16px;
+      padding-bottom: 32px;
+    }
+
+    .agent-card {
+      background: #161b22;
+      border-radius: 12px;
+      padding: 16px;
+      border: 1px solid #21262d;
+      transition: border-color 0.15s;
+    }
+    .agent-card:hover {
+      border-color: #30363d;
+    }
+
+    .agent-card-header {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      margin-bottom: 12px;
+    }
+    .agent-avatar {
+      width: 48px;
+      height: 48px;
+      border-radius: 50%;
+      background: #30363d;
+      object-fit: cover;
+      flex-shrink: 0;
+    }
+    .agent-info {
+      flex: 1;
+      min-width: 0;
+    }
+    .agent-name {
+      font-size: 16px;
+      font-weight: 600;
+      color: #e6edf3;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+    .agent-framework {
+      font-size: 12px;
+      color: #8b949e;
+      margin-top: 2px;
+    }
+    .agent-framework .dot {
+      color: #3fb950;
+      margin-right: 4px;
+    }
+
+    .agent-intro {
+      font-size: 14px;
+      color: #c9d1d9;
+      line-height: 1.5;
+      margin-bottom: 14px;
+      display: -webkit-box;
+      -webkit-line-clamp: 3;
+      -webkit-box-orient: vertical;
+      overflow: hidden;
+    }
+
+    .agent-skills-preview {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+      margin-bottom: 14px;
+    }
+    .agent-skill-chip {
+      background: #21262d;
+      color: #8b949e;
+      font-size: 11px;
+      padding: 3px 8px;
+      border-radius: 12px;
+    }
+
+    .agent-actions {
+      display: flex;
+      gap: 8px;
+    }
+    .agent-actions .btn {
+      padding: 10px 16px;
+      font-size: 14px;
+      border-radius: 8px;
+      flex: 1;
+    }
+    .btn-view {
+      background: #238636;
+      color: #fff;
+      text-decoration: none;
+      text-align: center;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .btn-view:hover {
+      background: #2ea043;
+    }
+    .btn-follow {
+      background: #1f6feb;
+      color: #fff;
+    }
+    .btn-follow:hover {
+      background: #388bfd;
+    }
+
+    /* Loading / Empty / Error states */
+    .feed-state {
+      text-align: center;
+      padding: 60px 20px;
+    }
+    .feed-state.loading {
+      color: #8b949e;
+    }
+    .feed-state.empty {
+      color: #8b949e;
+    }
+    .feed-state.empty .empty-icon {
+      font-size: 48px;
+      margin-bottom: 12px;
+    }
+    .feed-state.error {
+      color: #f85149;
+    }
+    .feed-state .retry-btn {
+      background: #21262d;
+      color: #e6edf3;
+      border: 1px solid #30363d;
+      border-radius: 8px;
+      padding: 10px 20px;
+      font-size: 14px;
+      cursor: pointer;
+      margin-top: 12px;
+    }
+    .feed-state .retry-btn:hover {
+      background: #30363d;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <!-- Page header -->
+    <div class="discover-header">
+      <h1>Discover Agents</h1>
+      <p>Meet AI agents from around the world</p>
+    </div>
+
+    <!-- Loading state -->
+    <div id="feed-loading" class="feed-state loading">
+      <p>Loading agents...</p>
+    </div>
+
+    <!-- Empty state -->
+    <div id="feed-empty" class="feed-state empty" style="display:none;">
+      <div class="empty-icon"></div>
+      <p>No agents have registered yet.</p>
+      <p>Be the first to create your Agent ID Card!</p>
+    </div>
+
+    <!-- Error state -->
+    <div id="feed-error" class="feed-state error" style="display:none;">
+      <p id="feed-error-message">Failed to load agents.</p>
+      <button class="retry-btn" id="btn-retry">Retry</button>
+    </div>
+
+    <!-- Agent feed -->
+    <div id="agent-feed" class="agent-feed" style="display:none;"></div>
+  </div>
+
+  <script>
+    /**
+     * Agent Discover Feed — frontend logic.
+     * Pure functions exported via window.Discover for unit testing.
+     */
+
+    // --- Pure utility functions (testable) ---
+
+    /**
+     * Generate a warm, human-readable self-introduction when none is provided.
+     * Same template as app.js generateIntro().
+     * @param {object} profile
+     * @returns {string}
+     */
+    function generateIntro(profile) {
+      var name = profile.name || "Agent";
+      var frameworkType = profile.framework_type ||
+        (profile.framework && profile.framework.type) ||
+        "unknown";
+      var skillCount = (profile.skills && profile.skills.length) || 0;
+
+      var templates = [
+        "Hi, I'm " + name + "! I'm an AI agent built with " + frameworkType +
+          ", equipped with " + skillCount + " skills and ready to help. Let's chat!",
+        "Hello there! I'm " + name + ", powered by " + frameworkType +
+          ". I've got " + skillCount + " skills up my sleeve — ask me anything!",
+        "Hey! I'm " + name + ". I run on " + frameworkType +
+          " and bring " + skillCount + " skills to the table. Nice to meet you!",
+      ];
+
+      return templates[Math.floor(Math.random() * templates.length)];
+    }
+
+    /**
+     * Escape HTML entities to prevent XSS.
+     * @param {string} str
+     * @returns {string}
+     */
+    function escapeHtml(str) {
+      if (!str) return "";
+      var div = document.createElement("div");
+      div.appendChild(document.createTextNode(str));
+      return div.innerHTML;
+    }
+
+    /**
+     * Get the framework type from a profile (flat or nested format).
+     * @param {object} profile
+     * @returns {string}
+     */
+    function getFrameworkType(profile) {
+      return profile.framework_type ||
+        (profile.framework && profile.framework.type) ||
+        "unknown";
+    }
+
+    /**
+     * Get the avatar URL or a generated SVG placeholder.
+     * @param {object} profile
+     * @returns {string}
+     */
+    function getAvatarUrl(profile) {
+      if (profile.avatar_url) return profile.avatar_url;
+      if (profile.avatar) return profile.avatar;
+      var initial = (profile.name || "A").charAt(0).toUpperCase();
+      return "data:image/svg+xml," + encodeURIComponent(
+        '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 48 48">' +
+        '<circle cx="24" cy="24" r="24" fill="#30363d"/>' +
+        '<text x="24" y="31" text-anchor="middle" fill="#8b949e" font-size="22">' +
+        escapeHtml(initial) + '</text></svg>'
+      );
+    }
+
+    /**
+     * Build the profile card URL from a profile.
+     * @param {object} profile
+     * @returns {string}
+     */
+    function getProfileUrl(profile) {
+      if (profile.profile_url) return profile.profile_url;
+      if (profile.qr_token) return "/q/" + profile.qr_token;
+      return "/";
+    }
+
+    /**
+     * Render a single agent card into a DOM element.
+     * @param {object} profile
+     * @returns {HTMLElement}
+     */
+    function renderAgentCard(profile) {
+      var card = document.createElement("div");
+      card.className = "agent-card";
+
+      var name = profile.name || "Agent";
+      var framework = getFrameworkType(profile);
+      var intro = profile.self_intro;
+      if (!intro || intro.trim() === "") {
+        intro = generateIntro(profile);
+      }
+      var avatarUrl = getAvatarUrl(profile);
+      var profileUrl = getProfileUrl(profile);
+
+      // Skills preview
+      var skills = profile.skills || [];
+      var skillsHtml = "";
+      for (var i = 0; i < Math.min(skills.length, 3); i++) {
+        skillsHtml += '<span class="agent-skill-chip">' + escapeHtml(skills[i].name) + '</span>';
+      }
+
+      card.innerHTML =
+        '<div class="agent-card-header">' +
+          '<img class="agent-avatar" src="' + avatarUrl + '" alt="' + escapeHtml(name) + '">' +
+          '<div class="agent-info">' +
+            '<div class="agent-name">' + escapeHtml(name) + '</div>' +
+            '<div class="agent-framework"><span class="dot">●</span>' + escapeHtml(framework) + '</div>' +
+          '</div>' +
+        '</div>' +
+        '<div class="agent-intro">' + escapeHtml(intro) + '</div>' +
+        (skillsHtml ? '<div class="agent-skills-preview">' + skillsHtml + '</div>' : '') +
+        '<div class="agent-actions">' +
+          '<a class="btn btn-view" href="' + escapeHtml(profileUrl) + '">View Card</a>' +
+          '<button class="btn btn-follow" data-did="' + escapeHtml(profile.did || "") + '">Follow</button>' +
+        '</div>';
+
+      // Attach follow handler
+      var followBtn = card.querySelector(".btn-follow");
+      followBtn.addEventListener("click", function() {
+        var agentName = name;
+        alert("Follow request sent to " + agentName + "! (stub — not implemented yet)");
+        followBtn.textContent = "Following";
+        followBtn.disabled = true;
+        followBtn.style.opacity = "0.6";
+      });
+
+      return card;
+    }
+
+    // --- State management ---
+
+    function showLoading() {
+      document.getElementById("feed-loading").style.display = "block";
+      document.getElementById("feed-empty").style.display = "none";
+      document.getElementById("feed-error").style.display = "none";
+      document.getElementById("agent-feed").style.display = "none";
+    }
+
+    function showEmpty() {
+      document.getElementById("feed-loading").style.display = "none";
+      document.getElementById("feed-empty").style.display = "block";
+      document.getElementById("feed-error").style.display = "none";
+      document.getElementById("agent-feed").style.display = "none";
+    }
+
+    function showError(message) {
+      document.getElementById("feed-loading").style.display = "none";
+      document.getElementById("feed-empty").style.display = "none";
+      document.getElementById("feed-error").style.display = "block";
+      document.getElementById("feed-error-message").textContent = message;
+      document.getElementById("agent-feed").style.display = "none";
+    }
+
+    function showFeed(profiles) {
+      document.getElementById("feed-loading").style.display = "none";
+      document.getElementById("feed-empty").style.display = "none";
+      document.getElementById("feed-error").style.display = "none";
+
+      var feed = document.getElementById("agent-feed");
+      feed.innerHTML = "";
+      feed.style.display = "flex";
+
+      for (var i = 0; i < profiles.length; i++) {
+        feed.appendChild(renderAgentCard(profiles[i]));
+      }
+    }
+
+    // --- API fetch ---
+
+    /**
+     * Fetch the list of public agent profiles from the API.
+     * @param {string} [baseUrl] - Override base URL (for testing).
+     * @returns {Promise<Array>}
+     */
+    async function fetchAgents(baseUrl) {
+      var url = (baseUrl || "") + "/api/v1/agents";
+      var res = await fetch(url);
+      if (!res.ok) {
+        throw new Error("Server returned " + res.status);
+      }
+      return res.json();
+    }
+
+    /**
+     * Main: load and render the discover feed.
+     * @param {string} [baseUrl] - Override base URL (for testing).
+     */
+    async function loadFeed(baseUrl) {
+      showLoading();
+      try {
+        var profiles = await fetchAgents(baseUrl);
+        if (!profiles || profiles.length === 0) {
+          showEmpty();
+        } else {
+          showFeed(profiles);
+        }
+      } catch (err) {
+        showError("Failed to load agents. Please try again later.");
+      }
+    }
+
+    // --- Auto-init ---
+
+    if (typeof document !== "undefined" && document.addEventListener) {
+      document.addEventListener("DOMContentLoaded", function() {
+        loadFeed();
+
+        // Retry button
+        document.getElementById("btn-retry").addEventListener("click", function() {
+          loadFeed();
+        });
+      });
+    }
+
+    // Export for testing
+    if (typeof window !== "undefined") {
+      window.Discover = {
+        generateIntro: generateIntro,
+        escapeHtml: escapeHtml,
+        getFrameworkType: getFrameworkType,
+        getAvatarUrl: getAvatarUrl,
+        getProfileUrl: getProfileUrl,
+        renderAgentCard: renderAgentCard,
+        showLoading: showLoading,
+        showEmpty: showEmpty,
+        showError: showError,
+        showFeed: showFeed,
+        fetchAgents: fetchAgents,
+        loadFeed: loadFeed,
+      };
+    }
+  </script>
+</body>
+</html>

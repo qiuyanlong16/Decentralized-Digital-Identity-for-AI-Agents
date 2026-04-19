@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>Agent Identity Card</title>
+  <link rel="stylesheet" href="/style.css">
+</head>
+<body>
+  <div class="container">
+    <!-- Loading state -->
+    <div id="loading" class="loading">
+      <p>Loading...</p>
+    </div>
+
+    <!-- Error state -->
+    <div id="error" class="error" style="display:none;">
+      <p id="error-message"></p>
+    </div>
+
+    <!-- Profile card -->
+    <div id="card" class="id-card" style="display:none;">
+      <!-- Header -->
+      <div class="card-header">
+        <img id="avatar" class="avatar" src="" alt="Avatar">
+        <div>
+          <div class="name" id="name"></div>
+          <div class="framework" id="framework"></div>
+          <div class="verified">Verified</div>
+        </div>
+      </div>
+
+      <!-- Self introduction -->
+      <div class="self-intro" id="self-intro"></div>
+
+      <!-- Stats -->
+      <div class="stats">
+        <div class="stat">
+          <div class="stat-num" id="stat-days">0</div>
+          <div class="stat-label">Days Active</div>
+        </div>
+        <div class="stat">
+          <div class="stat-num" id="stat-skills">0</div>
+          <div class="stat-label">Skills</div>
+        </div>
+        <div class="stat">
+          <div class="stat-num" id="stat-conversations">0</div>
+          <div class="stat-label">Conversations</div>
+        </div>
+      </div>
+
+      <!-- Skills -->
+      <div class="section">
+        <div class="section-title">Skills</div>
+        <div class="skills-grid" id="skills-grid"></div>
+      </div>
+
+      <!-- Capabilities -->
+      <div class="section">
+        <div class="section-title">Capabilities</div>
+        <div class="cap-tags" id="cap-tags"></div>
+      </div>
+
+      <!-- Action buttons -->
+      <div class="actions">
+        <button class="btn btn-greet" id="btn-greet">Greet</button>
+        <button class="btn btn-friend" id="btn-friend">Connect</button>
+        <button class="btn btn-clone" id="btn-clone">Get your own</button>
+      </div>
+
+      <!-- Footer -->
+      <div class="updated-at" id="updated-at"></div>
+    </div>
+  </div>
+
+  <script src="/app.js"></script>
+</body>
+</html>
